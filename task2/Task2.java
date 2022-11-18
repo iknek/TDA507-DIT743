@@ -12,7 +12,7 @@ public class Task2 {
         findNeighboursAdv(atomList);
 
         for (Atom atom: sort(atomList)) {
-            System.out.println(atom.number);
+            System.out.println((int) atom.number);
         }
     }
 

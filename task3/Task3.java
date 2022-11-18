@@ -1,17 +1,13 @@
-import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
 public class Task3 {
 
-    public static void main(String[] args) {
-        List<Atom> atomList = atomFactory(readFile("task2/data_q1.txt"));
-
-        for (Atom atom: sort(atomList)) {
-            System.out.println(atom.number);
-        }
+    public static void main(String[] args) throws IOException {
+        File file = new File("task3/1cdh.pdb");
+        cleanPDB(file);
     }
 
     /**
@@ -25,6 +21,24 @@ public class Task3 {
         }
         return null;
     }
+
+    public static void cleanPDB(File file) throws IOException {
+        //File newPDB = new File("TDA507-DIT743/task3", file.getName()+ "new");
+
+        BufferedWriter writer = new BufferedWriter(new FileWriter("cleaned", true));
+        Scanner scanner = new Scanner(file);
+        int count = 0;
+        while(scanner.hasNextLine()){
+            String string = scanner.nextLine();
+            if(string.startsWith("ATOM")) {
+                writer.write(string);
+                writer.newLine();
+            }
+        }
+        writer.close();
+        System.out.println(count);
+    }
+
 
     /**
      * Takes the first atom found in startChain, then adds its neighbours in order.
