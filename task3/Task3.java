@@ -7,58 +7,31 @@ public class Task3 {
 
     public static void main(String[] args) throws IOException {
         File file = new File("task3/1cdh.pdb");
-        cleanPDB(file);
+        txtToAtom(file);
+
     }
 
     /**
-     * Helper method for sort, simply find an atom with only 1 neighbour, to start the chain with.
+     * Takes all atoms/hetatm in file, makes them into atom objects, then returns a list of them.
      */
-    public static Atom startChain(List<Atom> atomList){
-        for (Atom atom: atomList) {
-            if(atom.neighbour.size() == 1){
-                return atom;
-            }
-        }
-        return null;
-    }
-
-    public static void cleanPDB(File file) throws IOException {
-        //File newPDB = new File("TDA507-DIT743/task3", file.getName()+ "new");
-
-        BufferedWriter writer = new BufferedWriter(new FileWriter("cleaned", true));
+    public static List<Atom> txtToAtom(File file) throws FileNotFoundException {
+        List<Atom> atomList = new ArrayList<>();
         Scanner scanner = new Scanner(file);
-        int count = 0;
         while(scanner.hasNextLine()){
-            String string = scanner.nextLine();
-            if(string.startsWith("ATOM")) {
-                writer.write(string);
-                writer.newLine();
+            String string = scanner.nextLine().replaceAll("\\s+"," ");
+            if(string.startsWith("ATOM") || string.startsWith("HETATM")){
+                List<String> splitString = List.of(string.split(" "));
+                String name  = splitString.get(2);
+                int number   = Integer.parseInt(splitString.get(1));
+                double xCord = Double.parseDouble(splitString.get(6));
+                double yCord = Double.parseDouble(splitString.get(7));
+                double zCord = Double.parseDouble(splitString.get(8));
+                Atom atom = new Atom(number,xCord,yCord,zCord,name);
+                atomList.add(atom);
             }
         }
-        writer.close();
-        System.out.println(count);
-    }
-
-
-    /**
-     * Takes the first atom found in startChain, then adds its neighbours in order.
-     */
-    public static List<Atom> sort(List<Atom> aList){
-        List<Atom> initList = new ArrayList<>(aList);
-        List<Atom> finalList = new ArrayList<>();
-
-        finalList.add(startChain(aList));
-        initList.remove(startChain(aList));
-
-        for(int j = 0; j < aList.size(); j++) {
-            for (int i = 0; i < initList.size(); i++) {
-                if(finalList.get(j).neighbour.contains(initList.get(i))){
-                    finalList.add(initList.get(i));
-                    initList.remove(initList.get(i));
-                }
-            }
-        }
-        return finalList;
+        scanner.close();
+        return atomList;
     }
 
     /**
@@ -68,44 +41,6 @@ public class Task3 {
         return Math.sqrt(Math.pow(atom2.x - atom1.x,2) + Math.pow(atom2.y - atom1.y,2) + Math.pow(atom2.z - atom1.z,2));
     }
 
-    /**
-     * Reads a txt file and puts all data from it into a matrix.
-     */
-    public static double[][] readFile(String path){
-        double[][] value = null;
-        File file = new File(path);
-        try {
-            Scanner sizeScanner = new Scanner(file);
-            int rows = (sizeScanner.nextLine().split(" ")).length;
-            int col = sizeScanner.findAll("\n").toList().size() + 1;
-            sizeScanner.close();
-
-            Scanner scanner = new Scanner(file);
-            value = new double[col][rows];
-            for (int i = 0; i < col; i++) {
-                String[] numbers = scanner.nextLine().split(" ");
-                for (int j = 0; j < rows; j++) {
-                    value[i][j] = Double.parseDouble(numbers[j]);
-                }
-            }
-            scanner.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-        return value;
-    }
-
-    /**
-     * Goes through the created matrix, and makes objects of type atom for each entry.
-     */
-    public static List<Atom> atomFactory(double[][] mat){
-        List<Atom> atomList = new ArrayList<>();
-        for (int i = 0; i < mat.length; i++) {
-            double number = mat[i][0];
-            atomList.add(new Atom(number, mat[i][1],mat[i][2],mat[i][3]));
-        }
-        return atomList;
-    }
 
     /**
      * Simply there for troubleshooting and checking imports work. Prints a matrix of any size.
@@ -122,16 +57,17 @@ public class Task3 {
      */
     public static class Atom{
         private final double number;
+        private final String name;
         private final double x;
         private final double y;
         private final double z;
-        private List<Atom> neighbour = new ArrayList<>();
 
-        public Atom(double number, double x, double y, double z){
+        public Atom(double number, double x, double y, double z, String name){
             this.number = number;
-            this.x = x;
-            this.y = y;
-            this.z = z;
+            this.name   = name;
+            this.x      = x;
+            this.y      = y;
+            this.z      = z;
         }
     }
 }

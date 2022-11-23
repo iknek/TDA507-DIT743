@@ -93,7 +93,7 @@ public class Task2 {
         try {
             Scanner sizeScanner = new Scanner(file);
             int rows = (sizeScanner.nextLine().split(" ")).length;
-            int col = sizeScanner.findAll("\n").toList().size() + 1;
+            int col = sizeScanner.findAll("\n").toArray().length + 1;
             sizeScanner.close();
 
             Scanner scanner = new Scanner(file);
