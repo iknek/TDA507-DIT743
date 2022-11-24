@@ -8,7 +8,13 @@ public class Task3 {
     public static void main(String[] args) throws IOException {
         File file = new File("task3/1cdh.pdb");
         txtToAtom(file);
+        lowest(file);
+    }
 
+    public static void lowest(File file) throws FileNotFoundException {
+        List<Atom> list = txtToAtom(file);
+        //printMatrix(matrix3d(list));
+        matrix3d(list);
     }
 
     /**
@@ -34,6 +40,35 @@ public class Task3 {
         return atomList;
     }
 
+    public static Atom[][][] matrix3d(List<Atom> atomList){
+        Atom[][][] matrix = new Atom[76][84][96];
+        int count = 0;
+        for (Atom atom: atomList) {
+            double atomX = atom.x - (atom.x % 2);
+            double atomY = atom.y - (atom.y % 2);
+            double atomZ = atom.z - (atom.z % 2);
+            matrix[(int) atomX][(int) atomY][(int) atomZ] = atom;
+            /*
+            outer: for (int i = -48; i <= 28; i++) {
+                if(i == atomX){
+                    for (int j = 12; j <= 72; j++) {
+                        if(j == atomY){
+                            for (int k = 20; k <= 96; k++) {
+                                if(k == atomZ){
+                                    matrix[i][j][k] = atom;
+                                    count+=1;
+                                    System.out.println(count);
+                                    break outer;
+                                }
+                            }
+                        }
+                    }
+                }
+            }*/
+        }
+        System.out.println(count);
+        return matrix;
+    }
     /**
      * Finds distance between 2 atoms.
      */
@@ -45,10 +80,11 @@ public class Task3 {
     /**
      * Simply there for troubleshooting and checking imports work. Prints a matrix of any size.
      */
-    public static void printMatrix(double[][] mat){
-        for (int i = 0; i < mat.length; i++){
-            for (int j = 0; j < mat[i].length; j++)
-                System.out.print(mat[i][j] + " ");
+    public static void printMatrix(Atom[][][] mat){
+        for (int i = 0; i <= mat[i].length; i++){
+            for (int j = 0; j <= mat[j].length; j++)
+                for (int k = 0; k <= mat[k].length; j++)
+                    System.out.print(mat[i][j][k] + " ");
         }
     }
 
