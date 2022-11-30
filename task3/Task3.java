@@ -2,14 +2,20 @@ import java.io.*;
 import java.util.*;
 
 public class Task3 {
-
     static int countComp = 0;
     static int countOverlap = 0;
 
+    static File fileA;
+
+    static String fileAName;
+
+    static String fileBName;
+
+    static File fileB;
 
     /**
      * The approach that I have taken is as follows:
-     * 1. The program reads in all lines from a text file, and makes them into objects of type atom
+     * 1. The program reads in all lines from a text file, and makes them into objects of type atom (if line starts with ATOM or HETATM).
      * 2. It creates an empty 3-d matrix of type Pair with a (currently) hard coded size, corresponding to the maximum X/Y/Z coordinates. This matrix is a
      * representation of the space of the protein.
      *      2.5. The matrix has objects of type Pair, which itself contain a list of atoms from file1, and a list from file2, alongside an x,y, and z coordinate
@@ -17,24 +23,41 @@ public class Task3 {
      * 4. The program goes through the matrix. Upon finding a cell with a non-empty list1 (i.e. a cell with at least 1 atom from file1), it then checks all
      * neighbours of that cell.
      * 5. The results are saved to a file.
-
-     Ultimately, if this program worked fully, I believe it would be a very effective approach, as the number of comparisons is significantly reduced compared to most other
-     methods, and particularly the one which was used in the sample files.
-
-     TODO: As it stands, the program doesn't find all overlapping Atoms, and in some cases creates duplicates (these are however removed, and the total number for
-           overlapping atoms is adjusted accordingly). I'm not sure why, but will attempt to fix this after the deadline.
+     *      5.5. Since this file may contain duplicates (in the event an atom overlaps with more than 1 other atom), the program cleans the
+     *      list and updates the total number of overlapping atoms accordingly.
      */
 
     public static void main(String[] args) throws IOException {
-        File file = new File("task3/1cdh.pdb");
-        File fileTwo = new File("task3/2csn.pdb");
 
-        checkOverlap(fileTwo,file);
-        stripDuplicatesFromFile("output");
+        findFiles();
+
+        checkOverlap(fileA,fileB);
+
+        //Results are saved to a file named "output".
+        stripDuplicatesFromFile(fileAName + "_" + fileBName);
 
         System.out.println("Overlaps " + countOverlap);
         System.out.println("Comparisons " + countComp);
 
+    }
+
+    /**
+     * Small scanner to let users choose which files to import.
+     * Note these files must be in the same folder (of name task3) as the code file.
+     */
+    public static void findFiles(){
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.println("Choose file 1. Please write just the file name!");
+        fileAName = scanner.nextLine();
+        String fileAPath = ("task3/" + fileAName + ".pdb");
+
+        System.out.println("Choose file 2. Please write just the file name!");
+        fileBName =  scanner.nextLine();
+        String fileBPath = ("task3/" + fileBName + ".pdb");
+
+        fileA = new File(fileAPath);
+        fileB = new File(fileBPath);
     }
 
     /**
@@ -63,6 +86,7 @@ public class Task3 {
      */
     public static Pair[][][] matrixFillerTwo(List<Atom> atomList, Pair[][][] initMatrix){
         for (Atom atom: atomList) {
+
             double atomX = Math.round(atom.x);
             double atomY = Math.round(atom.y);
             double atomZ = Math.round(atom.z);
@@ -99,17 +123,18 @@ public class Task3 {
     }
 
     /**
-     * Gets all neighbours for a cell, check if they have an atom, and then double checks distance to atom(s) (needed to due to previous rounding).
+     * Gets all neighbours for a cell, check if they have an atom, and then double checks distance to atom(s)
+     * (needed to due to previous rounding).
      */
     public static List<Atom> neighbours(int x, int y, int z, Pair[][][] matrix, Atom atomOrg) throws IOException {
         List<Atom> atoms = new ArrayList<>();
         List<Atom> atomToRemove = new ArrayList<>();
 
-        for (int i = -2; i <= 2; i++) {
+        for (int i = -4; i <= 4; i++) {
             if(x+i < 73 && x+i > -1){
-                for (int j = -2; j <= 2; j++) {
+                for (int j = -4; j <= 4; j++) {
                     if(y+j < 72 && y+j > -1){
-                        for (int k = -2; k <= 2; k++) {
+                        for (int k = -4; k <= 4; k++) {
                             if(z+k < 96 && z+k > -1) {
                                 if (matrix[x + i][y + j][z + k].listTwo.size() != 0){
                                     atoms.addAll(matrix[x + i][y + j][z + k].listTwo);
@@ -122,7 +147,7 @@ public class Task3 {
         }
         for (Atom atom: atoms) {
             countComp += 1;
-            if(distance(atom, atomOrg) <= 2){
+            if(distance(atom, atomOrg) <= 4){
                 countOverlap += 1;
                 atomToRemove.add(atom);
                 writeToFile(atom);
@@ -206,8 +231,11 @@ public class Task3 {
         }
     }
 
+    /**
+     * Just a small method to write Atoms to a file.
+     */
     public static void writeToFile(Atom atom1) throws IOException {
-        BufferedWriter writer = new BufferedWriter(new FileWriter("output", true));
+        BufferedWriter writer = new BufferedWriter(new FileWriter(fileAName+"_"+fileBName, true));
         writer.write(atom1.number + "  " + atom1.name + "   " + atom1.numb2 + "  " + atom1.el);
         writer.newLine();
         writer.close();
@@ -245,10 +273,14 @@ public class Task3 {
         return atomList;
     }
 
+    /**
+     * Strips duplicates from the file made in writeToFile, and updates the total number of overlapping
+     * atoms accordingly.
+     */
     public static void stripDuplicatesFromFile(String filename) throws IOException {
         int count = 0;
         BufferedReader reader = new BufferedReader(new FileReader(filename));
-        Set<String> lines = new HashSet<String>(5000);
+        Set<String> lines = new HashSet<>(5000);
         String line;
         while ((line = reader.readLine()) != null) {
             lines.add(line);
