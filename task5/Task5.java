@@ -9,10 +9,7 @@ import java.util.Scanner;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
-
 public class Task5 {
-
-
     static double smallestP;
     
     static double largestP;
