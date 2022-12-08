@@ -15,19 +15,19 @@ public class MatrixVisualizer2000 extends JFrame {
         setDefaultCloseOperation(EXIT_ON_CLOSE);
     }
 
-    // get the color for a heatmap value in the range [0, 1]
+    /** Gives the color for a heatmap value in the range 0 to 1. I.e, maps a number to a colour. */
     private Color getHeatmapColor(double value) {
         float hue = (float)(1.0 - value) * 280 / 360;
         return Color.getHSBColor(hue, 1.0f, 0.6f);
     }
 
+    /** Draws each element in the matrix */
     @Override
     public void paint(Graphics g) {
         super.paint(g);
         int x;
         int y = 0;
 
-        // Draws each element in the matrix
         for (double[] doubles : matrix) {
             x = 0;
             for (double aDouble : doubles) {

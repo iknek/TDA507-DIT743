@@ -41,6 +41,11 @@ public class Task5 {
         matrixVisualizer.setVisible(true);
     }
 
+    /** Exercise 5
+     * This method:
+     * Saves the transitional matrix to a file named transitionMatrix.txt
+     * Returns it as an array.
+     */
     public static double[][] transitionMatrix() throws IOException {
         double[][] tMatrix = new double[numBins][numBins];
         int rowIndex = -1;
@@ -64,6 +69,38 @@ public class Task5 {
         }
         writer.close();
         return tMatrix;
+    }
+
+    /**
+     * Same as above, but with the txt file made of fractions.
+     */
+    public static void tMatrixAsFractions() throws IOException {
+        String[][] tMatrix = new String[numBins][numBins];
+        int rowIndex = -1;
+        for (int[] row : countMatrix) {
+            int colIndex = -1;
+            rowIndex += 1;
+            double sum = Arrays.stream(row).sum();
+            for (int i = 0; i < row.length; i++) {
+                colIndex += 1;
+                int number = countMatrix[rowIndex][colIndex];
+                if(number == 0){
+                    tMatrix[rowIndex][colIndex] = String.valueOf(number);
+                }
+                else{
+                    tMatrix[rowIndex][colIndex] = number + "/" + (int) sum;
+                }
+            }
+        }
+        FileWriter writer = new FileWriter("transitionMatrix.txt");
+        for (String[] mat : tMatrix) {
+            for (String i : mat) {
+                String str = String.format(i);
+                writer.write(str + "  ");
+            }
+            writer.write("\n");
+        }
+        writer.close();
     }
 
     /** Exercise 4
