@@ -298,5 +298,4 @@ public class Task3 {
         writer.close();
         countOverlap = count;
     }
-
 }
