@@ -6,13 +6,38 @@ import java.awt.*;
 public class MatrixVisualizer2000 extends JFrame {
 
     private double[][] matrix;
+    private JLabel rowLabel;
+    private JLabel colLabel;
+    GridBagConstraints gbc;
 
+    /**
+     * Simple Java Swing class to draw out the transitional matrix, mapping each number to a colour, to create a heatmap.
+     */
     public MatrixVisualizer2000(double[][] mat){
         setTitle("Matrix Visualizer");
         matrix = mat;
         setSize(1000, 1000);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
+        // Create labels for the rows and columns.
+        String[] rLabel = "X axis".split("");
+        String[] cLabel = "Y axis".split("");
+
+        rowLabel = new JLabel();
+        rowLabel.setText("<html>" + String.join("<br>", rLabel) + "</html>");
+        colLabel = new JLabel();
+        colLabel.setText("<html>" + String.join("<br>", cLabel) + "</html>");
+
+        add(rowLabel, gbc);
+        add(colLabel, gbc);
+
+        // Add the labels to the panel using GridBagLayout.
+        gbc = new GridBagConstraints();
+        gbc.gridheight = 1000;
+        gbc.gridwidth = 1000;
+        gbc.gridx = 1000;
+        gbc.gridy = 1000;
+        gbc.fill = GridBagConstraints.BOTH;
     }
 
     /** Gives the color for a heatmap value in the range 0 to 1. I.e, maps a number to a colour. */
@@ -38,4 +63,5 @@ public class MatrixVisualizer2000 extends JFrame {
             y += 10;
         }
     }
+
 }
